@@ -35,9 +35,7 @@ class VarianceLoss(nn.Module):
         loss_var_nor = sum(var_nors_nor) / (b // 2)
 
 
-        pdb.set_trace()
-
-
+        # pdb.set_trace()
 
         loss_var = loss_var_nor / (loss_var_abn + 1e-5)
 
