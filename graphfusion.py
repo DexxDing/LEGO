@@ -44,6 +44,13 @@ class GraphFusion(nn.Module):
         self.m = m
         self.n = n
         self.a = nn.Parameter(torch.normal(mean=0, std=1, size=(self.m, self.n)))
+        # self.a = nn.Parameter(torch.rand(self.m, self.n))
+        # self.a = nn.Parameter(torch.abs(torch.normal(mean=0, std=1, size=(self.m, self.n))))
+
+
+
+
+
 
     def forward(self, fv, ft):
 
@@ -52,6 +59,7 @@ class GraphFusion(nn.Module):
         if fv.shape[0] == 10:
             test = True
             print(f'Test mode {test}')
+
 
 
         # l2 normalise
@@ -67,13 +75,17 @@ class GraphFusion(nn.Module):
 
 #*************************************************************************************#
         #
-        # sigma = 1.0
+        # sigma = 0.92 / 4
         #
         # f_v = F.normalize(fv, p=2, dim=2)
         # f_t = F.normalize(ft, p=2, dim=2)
         #
+        # # pdb.set_trace()
+        #
         # dist_v = torch.sum((f_v.unsqueeze(2) - f_v.unsqueeze(1)) ** 2, dim=3)
         # dist_t = torch.sum((f_t.unsqueeze(2) - f_t.unsqueeze(1)) ** 2, dim=3)
+        #
+        #
         #
         # a_v = torch.exp(-dist_v / (2 * sigma ** 2))
         # a_t = torch.exp(-dist_t / (2 * sigma ** 2))
@@ -115,8 +127,11 @@ class GraphFusion(nn.Module):
         av_powers = av_powers.permute(1, 2, 3, 0)
         at_powers = at_powers.permute(1, 0, 2, 3)
 
+
+        fusion_mtx = self.relu(self.a)
+
         # apply fusion matrix 'a' to conduct feature fusion
-        a_fused = torch.einsum('bijk,kl,blij->bij', av_powers, self.a, at_powers)  # [2b*c, seg, seg]
+        a_fused = torch.einsum('bijk,kl,blij->bij', av_powers, fusion_mtx, at_powers)  # [2b*c, seg, seg]
 
 
         # pdb.set_trace()
@@ -124,11 +139,13 @@ class GraphFusion(nn.Module):
 
 
         # a_fused = a_v * a_t
-        a_fused = self.relu(a_fused)
+        # a_fused = self.relu(a_fused)
         # a_fused = a_t
         a_max = torch.max(a_fused)
         a_fused = a_fused / (a_max + 1e-2)
-        fusion_matrix = self.a
+        fusion_matrix = fusion_mtx
+
+
 
 
 
@@ -161,14 +178,10 @@ class GraphClassifiction(nn.Module):
         self.graphfusion = GraphFusion(batch=batch_size, m=m, n=n)
         self.normal_head = NormalHead()
 
-        self.ratio_sample = 0.2
-        self.ratio_batch = 0.4
 
+    def get_scores(self, x, ncrops=None):
 
-    def get_normal_scores(self, x, ncrops=None):
-        new_x = x.permute(0, 2, 1)  # [5, 512, 67]
-
-        outputs = self.normal_head(new_x)
+        outputs = self.normal_head(x)
         normal_scores = outputs[-1]  # [5, 1, 67]
         xhs = outputs[:-1]  # xhs[0]: [5, 32, 67]  xhs[1]: [5, 16, 67]
 
@@ -210,22 +223,21 @@ class GraphClassifiction(nn.Module):
         # a_fused = ft
         # fusion_matrix = ft
 
-        normal_feats, normal_scores = self.get_normal_scores(a_fused, ncrops=c)
+        normal_feats, normal_scores = self.get_scores(a_fused, ncrops=c)
 
         if b*c == 10:
 
             return normal_scores, av, at, a_fused
 
-        bn_resutls = dict(
+        fusion_resutls = dict(
             fused_graphs=a_fused,
             av=av,
             at=at
         )
 
         return {
-            'pre_normal_scores': normal_scores[0:b // 2],
             'scores': normal_scores,
-            'bn_results': bn_resutls,
+            'bn_results': fusion_resutls,
             'fusion_matrix': fusion_matrix
         }
 

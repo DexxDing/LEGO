@@ -12,6 +12,7 @@ import graphfusion
 import torch.nn as nn
 from normal_loss import NormalLoss
 from variance_loss import VarianceLoss
+from con_loss import Connectivity_loss
 import pdb
 import itertools
 import matplotlib.pyplot as plt
@@ -52,18 +53,18 @@ if __name__ == '__main__':
 
 
     class CombinedLoss(nn.Module):
-        def __init__(self, w_normal=1., w_mpp=0., w_var=1.):
+        def __init__(self, w_normal=1., w_var=1., w_con=0.):
             super().__init__()
             self.w_normal = w_normal
-            self.w_mpp = w_mpp
             self.w_var = w_var
+            self.w_con = w_con
             self.normalLoss = NormalLoss()
             self.varLoss = VarianceLoss()
+            self.conLoss = Connectivity_loss(sigma=0.001)
 
         def forward(self, result, label):
             loss = {}
 
-            pre_normal_scores = result['pre_normal_scores']
             all_scores = result['scores']
 
             # normal_loss = self.normalLoss(pre_normal_scores)
@@ -74,7 +75,11 @@ if __name__ == '__main__':
 
             var_loss = self.varLoss(result)
 
-            loss['total_loss'] = self.w_normal * normal_loss + self.w_var * var_loss
+            con_loss = self.conLoss(result)
+
+            loss['total_loss'] = self.w_normal * normal_loss + self.w_var * var_loss + self.w_con * con_loss
+
+            # pdb.set_trace()
 
 
 
@@ -82,8 +87,8 @@ if __name__ == '__main__':
             return loss['total_loss'], loss
 
 
-    m_values = np.arange(5, 8)
-    n_values = np.arange(5, 8)
+    m_values = np.arange(4, 8)
+    n_values = np.arange(4, 8)
     combinations = list(itertools.product(m_values, n_values))
     print(f"Total combinations to test: {len(combinations)}")
 
@@ -94,7 +99,7 @@ if __name__ == '__main__':
         plot_label = str(f"{args.dataset}: m={m}, n={n}")
         wandb.init(
             project="GraphFusion",
-            name=f"{plot_label}_simplified",
+            name=f"{plot_label}_plot",
             reinit=True
         )
         model = graphfusion.GraphClassifiction(batch_size=32, m=m, n=n)

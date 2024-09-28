@@ -44,7 +44,7 @@ if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
 
-    epoch = 50
+    epoch = 75
 
     test_auc, test_ap = test(test_loader, model, args, device, epoch)
 

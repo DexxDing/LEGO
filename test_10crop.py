@@ -121,13 +121,13 @@ def test(loader, model, args, device, epoch):
                 a_v = (torch.bmm(f_v, f_v.transpose(1, 2)))
                 a_t = (torch.bmm(f_t, f_t.transpose(1, 2)))
 
-                av = a_v.detach().cpu().numpy()
-                av_path = f"./graphs/train/av/av_{args.dataset}_{batch_index}.npy"
-                np.save(av_path, av)
-
-                at = a_t.detach().cpu().numpy()
-                at_path = f"./graphs/train/at/at_{args.dataset}_{batch_index}.npy"
-                np.save(at_path, at)
+                # av = a_v.detach().cpu().numpy()
+                # av_path = f"./graphs/train/av/av_{args.dataset}_{batch_index}1.npy"
+                # np.save(av_path, av)
+                #
+                # at = a_t.detach().cpu().numpy()
+                # at_path = f"./graphs/train/at/at_{args.dataset}_{batch_index}1.npy"
+                # np.save(at_path, at)
 
 
                 # pdb.set_trace()
@@ -139,16 +139,16 @@ def test(loader, model, args, device, epoch):
                 # snippet_scores = torch.squeeze(snippet_scores, 1)
                 print('snippet scores dimension', snippet_scores.shape)
 
-                a_fused = a_fused.detach().cpu().numpy()
-                graph_path = f"./graphs/graph_{args.dataset}-{epoch}-batch{batch_index}.npy"
-                np.save(graph_path, a_fused)
-
+                # a_fused = a_fused.detach().cpu().numpy()
+                # graph_path = f"./graphs/graph_{args.dataset}-{epoch}-batch{batch_index}1.npy"
+                # np.save(graph_path, a_fused)
+                #
                 # av = av.detach().cpu().numpy()
-                # av_path = f"./graphs/av/av_{args.dataset}_{epoch}-batch{batch_index}.npy"
+                # av_path = f"./graphs/av/av_{args.dataset}_{epoch}-batch{batch_index}1.npy"
                 # np.save(av_path, av)
                 #
                 # at = at.detach().cpu().numpy()
-                # at_path = f"./graphs/at/at_{args.dataset}_{epoch}-batch{batch_index}.npy"
+                # at_path = f"./graphs/at/at_{args.dataset}_{epoch}-batch{batch_index}1.npy"
                 # np.save(at_path, at)
 
 
@@ -240,7 +240,6 @@ def test(loader, model, args, device, epoch):
 
         print('ROC AUC:', auc)
         print('Average Precision:', ap)
-        print('FPR', np.mean(fpr))
-        print('TPR', np.mean(tpr))
+
 
         return auc, ap
