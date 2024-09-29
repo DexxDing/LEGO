@@ -5,12 +5,13 @@ import numpy as np
 from utils import process_feat, get_rgb_list_file
 import torch
 from torch.utils.data import DataLoader
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
+# torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 
 class Dataset(data.Dataset):
     def __init__(self, args, is_normal=True, transform=None, test_mode=False):
-        self.modality = args.modality
+        #TODO: check this
+        # self.modality = args.modality
         self.emb_folder = args.emb_folder
         self.is_normal = is_normal
         self.dataset = args.dataset

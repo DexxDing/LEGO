@@ -7,7 +7,8 @@ import torch.nn.functional as F
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
-from normal_head import NormalHead
+#TODO: check this
+# from normal_head import NormalHead
 import itertools
 
 torch.manual_seed(4869)
@@ -176,12 +177,14 @@ class GraphClassifiction(nn.Module):
         self.embedding_v = Temporal(input_size=2048, out_size=32)
         self.embedding_t = Temporal(input_size=768, out_size=32)
         self.graphfusion = GraphFusion(batch=batch_size, m=m, n=n)
-        self.normal_head = NormalHead()
+        # self.normal_head = NormalHead()
 
 
     def get_scores(self, x, ncrops=None):
 
-        outputs = self.normal_head(x)
+        #TODO: check this
+        # outputs = self.normal_head(x)
+        outputs = x
         normal_scores = outputs[-1]  # [5, 1, 67]
         xhs = outputs[:-1]  # xhs[0]: [5, 32, 67]  xhs[1]: [5, 16, 67]
 
