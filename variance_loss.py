@@ -7,8 +7,10 @@ import torch.nn.functional as F
 
 
 class VarianceLoss(nn.Module):
-    def __init__(self):
+    def __init__(self, k, theshold):
         super(VarianceLoss, self).__init__()
+        self.k = k
+        self.threshold = theshold
 
 
     def forward(self, results):
@@ -19,25 +21,42 @@ class VarianceLoss(nn.Module):
         g_nor = features[0:b // 2]
         g_abn = features[b // 2:]
 
-
         var_nors_nor = []
         var_nors_abn = []
         for i in range(b // 2):
-            var_nor = torch.var(g_nor[i, :, :])
-            # var_nor = torch.mean(var_nor, dim=0)
-            var_nors_nor.append(var_nor)
+            a_nor = g_nor[i]
+            a_abn = g_abn[i]
 
-            var_abn = torch.var(g_abn[i, :, :])
-            # var_abn = torch.mean(var_abn, dim=0)
+
+            mask_nor = a_nor > self.threshold
+            mask_abn = a_nor > self.threshold
+
+            a_nor = a_nor * mask_nor.float()
+            a_abn = a_abn * mask_abn.float()
+
+            # pdb.set_trace()
+
+
+            deg_nor = torch.sum(a_nor, dim=-1)
+            topk_abn = torch.topk(a_abn, k=self.k, dim=-1)[0]
+            deg_abn = torch.sum(topk_abn, dim=-1)
+
+            var_nor = torch.var(deg_nor)
+            var_abn = torch.var(deg_abn)
+
+            var_nors_nor.append(var_nor)
             var_nors_abn.append(var_abn)
+
 
         loss_var_abn = sum(var_nors_abn) / (b // 2)
         loss_var_nor = sum(var_nors_nor) / (b // 2)
 
 
+
+        loss_var = loss_var_nor - loss_var_abn
+
         # pdb.set_trace()
 
-        loss_var = loss_var_nor / (loss_var_abn + 1e-10)
 
         return loss_var
 
