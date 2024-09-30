@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
 
     class CombinedLoss(nn.Module):
-        def __init__(self, w_normal=1., w_var=0., w_mean=0.01, threshold=0.5, k=10):
+        def __init__(self, w_normal=1., w_var=1., w_mean=0., threshold=0.5, k=10):
             super().__init__()
             self.k = k
             self.threshold = threshold
