@@ -7,10 +7,10 @@ import torch.nn.functional as F
 
 
 class VarianceLoss(nn.Module):
-    def __init__(self, k, theshold):
+    def __init__(self, k, threshold):
         super(VarianceLoss, self).__init__()
         self.k = k
-        self.threshold = theshold
+        self.threshold = threshold
 
 
     def forward(self, results):
@@ -29,7 +29,7 @@ class VarianceLoss(nn.Module):
 
 
             mask_nor = a_nor > self.threshold
-            mask_abn = a_nor > self.threshold
+            mask_abn = a_abn > self.threshold
 
             a_nor = a_nor * mask_nor.float()
             a_abn = a_abn * mask_abn.float()
