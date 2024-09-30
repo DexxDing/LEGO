@@ -13,7 +13,6 @@ import torch.nn as nn
 from normal_loss import NormalLoss
 from variance_loss import VarianceLoss
 from mean_loss import MeanLoss
-from con_loss import Connectivity_loss
 import pdb
 import itertools
 import matplotlib.pyplot as plt
