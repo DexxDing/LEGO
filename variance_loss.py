@@ -53,7 +53,7 @@ class VarianceLoss(nn.Module):
 
 
 
-        loss_var = loss_var_nor - loss_var_abn
+        loss_var = torch.norm(loss_var_nor - loss_var_abn)
 
         # pdb.set_trace()
 
