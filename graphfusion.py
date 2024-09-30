@@ -128,10 +128,11 @@ class GraphFusion(nn.Module):
         at_powers = at_powers.permute(1, 0, 2, 3)
 
 
-        fusion_mtx = self.relu(self.a)
 
         # apply fusion matrix 'a' to conduct feature fusion
-        a_fused = torch.einsum('bijk,kl,blij->bij', av_powers, fusion_mtx, at_powers)  # [2b*c, seg, seg]
+        a_fused = torch.einsum('bijk,kl,blij->bij', av_powers, self.a, at_powers)  # [2b*c, seg, seg]
+
+        # a_fused = F.sigmoid(self.a) * a_v * (1-F.sigmoid(self.a)) * a_t
 
 
         # pdb.set_trace()
@@ -139,11 +140,11 @@ class GraphFusion(nn.Module):
 
 
         # a_fused = a_v * a_t
-        # a_fused = self.relu(a_fused)
-        # a_fused = a_t
+        a_fused = self.relu(a_fused)
+        # a_fused = a_v
         a_max = torch.max(a_fused)
-        a_fused = a_fused / (a_max + 1e-2)
-        fusion_matrix = fusion_mtx
+        a_fused = a_fused / (a_max + 1e-10)
+        fusion_matrix = self.a
 
 
 
@@ -181,6 +182,7 @@ class GraphClassifiction(nn.Module):
 
     def get_scores(self, x, ncrops=None):
 
+
         outputs = self.normal_head(x)
         normal_scores = outputs[-1]  # [5, 1, 67]
         xhs = outputs[:-1]  # xhs[0]: [5, 32, 67]  xhs[1]: [5, 16, 67]
@@ -207,8 +209,7 @@ class GraphClassifiction(nn.Module):
 
 
         av, at, a_fused, fusion_matrix = self.graphfusion(fv, ft)
-        # a_fused = F.normalize(a_fused, p=2, dim=-1)
-        # temporal_map = self.graphfusion(fv, ft)
+
         #
         # fv = self.embedding_v(fv)
         # ft = self.embedding_t(ft)
@@ -220,13 +221,15 @@ class GraphClassifiction(nn.Module):
         # a_fused = fv * ft
         # a_fused = torch.add(fv, ft)
         # a_fused = torch.cat([fv, ft], dim=-1)
-        # a_fused = ft
-        # fusion_matrix = ft
+        # pdb.set_trace()
+        # a_fused = fv
+        # av = a_fused
+        # at = a_fused
+        # fusion_matrix = a_fused
 
         normal_feats, normal_scores = self.get_scores(a_fused, ncrops=c)
 
         if b*c == 10:
-
             return normal_scores, av, at, a_fused
 
         fusion_resutls = dict(
