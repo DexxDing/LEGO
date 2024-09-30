@@ -10,8 +10,7 @@ from torch.utils.data import DataLoader
 
 class Dataset(data.Dataset):
     def __init__(self, args, is_normal=True, transform=None, test_mode=False):
-        #TODO: check this
-        # self.modality = args.modality
+        self.modality = args.modality
         self.emb_folder = args.emb_folder
         self.is_normal = is_normal
         self.dataset = args.dataset
@@ -138,9 +137,9 @@ class Dataset(data.Dataset):
             text_path = "save/StreetScene/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
         elif 'combine' in self.dataset:
             text_path = "save/Combine/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
-
         else:
             raise Exception("Dataset undefined!!!")
+        
         text_features = np.load(text_path, allow_pickle=True)
         text_features = np.array(text_features, dtype=np.float32)  # [snippet no., 768]
         # assert features.shape[0] == text_features.shape[0]
@@ -160,7 +159,8 @@ class Dataset(data.Dataset):
         else:
             # process 10-cropped snippet feature
             features = features.transpose(1, 0, 2)  # [snippet no., 10, 2048] -> [10, snippet no., 2048]
-            print('feature dimension', features.shape)
+            #TODO: check this
+            # print('feature dimension', features.shape)
             divided_features = []
             for feature in features:  # loop 10 times
                 feature = process_feat(feature, 32)  # divide a video into 32 segments/snippets/clips

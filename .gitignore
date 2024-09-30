@@ -1,2 +1,10 @@
 /save/*
 /__pycache__/*
+/.vscode/*
+/graphs/*
+/fusion_matrix/*
+/ckpt/*
+
+*.npy
+*.txt
+*.log

@@ -9,7 +9,7 @@ parser.add_argument('--test-rgb-list', default=None, help='list of test rgb feat
 parser.add_argument('--gt', default=None, help='file of ground truth ')
 parser.add_argument('--gpus', default=1, type=int, choices=[0], help='gpus')
 parser.add_argument('--lr', type=str, default='[0.1]*15000', help='learning rates for steps(list form)')
-parser.add_argument('--batch-size', type=int, default=32, help='number of instances in a batch of data (default: 16)')
+parser.add_argument('--batch-size', type=int, default=2, help='number of instances in a batch of data (default: 16)')
 parser.add_argument('--workers', default=4, help='number of workers in dataloader')
 parser.add_argument('--model-name', default='rtfm', help='name to save model')
 parser.add_argument('--pretrained-ckpt', default=None, help='ckpt for pretrained model')
@@ -18,7 +18,7 @@ parser.add_argument('--dataset', default='ucf', help='dataset to train on (shang
 parser.add_argument('--plot-freq', type=int, default=10, help='frequency of plotting (default: 10)')
 
 parser.add_argument('--seed', type=int, default=4869, help='random seed (default: 4869)')
-parser.add_argument('--max-epoch', type=int, default=1000, help='maximum iteration to train (default: 1000)')
+parser.add_argument('--num_epochs', type=int, default=75, help='maximum iteration to train')
 parser.add_argument('--feature-group', default='both', choices=['both', 'vis', 'text'], help='feature groups used for the model')
 parser.add_argument('--fusion', type=str, default='concat', help='how to fuse vis and text features')
 parser.add_argument('--normal_weight', type=float, default=1, help='weight for normal loss weights')

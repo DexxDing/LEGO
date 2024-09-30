@@ -7,6 +7,7 @@ from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve, av
     confusion_matrix
 
 torch.manual_seed(4869)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def check_for_nan(tensor, name):
@@ -40,9 +41,8 @@ def get_metrics(frame_predict, frame_gt):
 def get_predicts(fv, ft, net):
     frame_predict = []
 
-
-    fv = fv.cuda()
-    ft = ft.cuda()
+    fv = fv.to(device)
+    ft = ft.to(device)
     res, av, at, a_fused = net(fv, ft)
 
     a_predict = res.cpu().numpy().mean(0)
@@ -68,7 +68,7 @@ def test(loader, model, args, device, epoch):
         model.eval()
         for batch_index, batch_features in enumerate(loader):
             # if batch_index < 3 and batch_index > 0:
-            print(f'Batch {batch_index + 1}')
+            print(f'Step {batch_index + 1}')
             v_features, t_features = [tensor.to(device) for tensor in batch_features]
             v_features = v_features.permute(0, 2, 1, 3)
             t_features = t_features.permute(0, 2, 1, 3)
@@ -86,7 +86,7 @@ def test(loader, model, args, device, epoch):
 
             v_features = v_features.view(-1, num_segments, feature_dim)
             t_features = t_features.view(-1, num_segments, feature_dim_t)
-            print(f'feature size before padding, {v_features.shape}, {t_features.shape}')
+            # print(f'feature size before padding, {v_features.shape}, {t_features.shape}')
 
             # sample out the gt for the given video
             video_gt = test_gt[gt_index:gt_index + num_segments]
@@ -95,15 +95,12 @@ def test(loader, model, args, device, epoch):
 
             if num_segments < window_size:
                 # padding for segments < 32
-                print('repeat padding')
+                # print('repeat padding')
                 repeat_times = window_size // num_segments + 1
                 # repeat the segments from the start until it reaches 32
 
 
                 # pdb.set_trace()
-
-
-
                 v_features = v_features.repeat(1, repeat_times, 1)[:, :window_size, :]
                 t_features = t_features.repeat(1, repeat_times, 1)[:, :window_size, :]
 
