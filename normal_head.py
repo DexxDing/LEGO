@@ -34,6 +34,7 @@ class NormalHead(nn.Module):
         '''
         outputs = []
         #  x: [5, 512, 67]
+        x = x.permute(0, 2, 1)
         x = self.conv1(x)
         x = self.act(x)
         #  conv1: [5, 32, 67]
@@ -43,8 +44,10 @@ class NormalHead(nn.Module):
         # outputs.append(x)
         x = self.sigmoid(self.conv3(self.act(self.bn2(x))))
         #  conv3: [5, 1, 67]
+        x = x.permute(0, 2, 1)
         outputs.append(x)
         #  output0: [5, 32, 67], output1: [5, 16, 67], output2: []
+
 
         # log_message_grad = f'conv1 grad: {self.conv1.weight.grad} \n conv2 grad: {self.conv2.weight.grad} \n conv3 grad: {self.conv3.weight.grad}'
         return outputs
