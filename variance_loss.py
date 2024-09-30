@@ -28,8 +28,8 @@ class VarianceLoss(nn.Module):
             a_abn = g_abn[i]
 
 
-            mask_nor = a_nor > self.threshold
-            mask_abn = a_abn > self.threshold
+            mask_nor = a_nor >= self.threshold
+            mask_abn = a_abn >= self.threshold
 
             a_nor = a_nor * mask_nor.float()
             a_abn = a_abn * mask_abn.float()

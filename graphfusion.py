@@ -43,7 +43,8 @@ class GraphFusion(nn.Module):
         self.relu = nn.ReLU()
         self.m = m
         self.n = n
-        self.a = nn.Parameter(torch.normal(mean=0, std=1, size=(self.m, self.n)))
+        self.a = nn.Parameter(torch.normal(mean=0, std=1, size=(self.m, self.n, 1, 1, 1)))
+        self.sigmoid = nn.Sigmoid()
         # self.a = nn.Parameter(torch.rand(self.m, self.n))
         # self.a = nn.Parameter(torch.abs(torch.normal(mean=0, std=1, size=(self.m, self.n))))
 
@@ -53,6 +54,8 @@ class GraphFusion(nn.Module):
 
 
     def forward(self, fv, ft):
+
+        fusion_operator = self.relu(self.a)
 
         # set flag for testing
         test = False
@@ -120,17 +123,21 @@ class GraphFusion(nn.Module):
 
 
 
+
+
         #  [P, B, N, N]  0,1,2,3
         # av: [B, N, N, P], a: [P, P], at: [B, P, N, N] -> C: [B, N, N]
 
         # rearrange the order of dimensions to keep batch at dimension 0
-        av_powers = av_powers.permute(1, 2, 3, 0)
-        at_powers = at_powers.permute(1, 0, 2, 3)
+        # av_powers = av_powers.permute(1, 2, 3, 0)
+        # at_powers = at_powers.permute(1, 0, 2, 3)
 
+        pow_product = av_powers.unsqueeze(1) * at_powers.unsqueeze(0)
 
+        a_fused = (pow_product * fusion_operator).sum(dim=(0, 1), keepdim=False)
 
         # apply fusion matrix 'a' to conduct feature fusion
-        a_fused = torch.einsum('bijk,kl,blij->bij', av_powers, self.a, at_powers)  # [2b*c, seg, seg]
+        # a_fused = torch.einsum('bijk,kl,blij->bij', av_powers, self.a, at_powers)  # [2b*c, seg, seg]
 
         # a_fused = F.sigmoid(self.a) * a_v * (1-F.sigmoid(self.a)) * a_t
 
@@ -140,7 +147,8 @@ class GraphFusion(nn.Module):
 
 
         # a_fused = a_v * a_t
-        a_fused = self.relu(a_fused)
+        a_fused = self.sigmoid(a_fused)
+        # a_fused = self.relu(a_fused)
         # a_fused = a_v
         a_max = torch.max(a_fused)
         a_fused = a_fused / (a_max + 1e-10)
@@ -153,18 +161,29 @@ class GraphFusion(nn.Module):
         return a_v, a_t, a_fused, fusion_matrix   # [b*c, seg, feat(seg)]
 
 
+# class Temporal(nn.Module):
+#     def __init__(self, input_size, out_size):
+#         super(Temporal, self).__init__()
+#         self.conv_1 = nn.Sequential(
+#             nn.Conv1d(in_channels=input_size, out_channels=out_size, kernel_size=3,
+#                     stride=1, padding=1),
+#             nn.ReLU(),
+#         )
+#     def forward(self, x):
+#         x = x.permute(0, 2, 1)
+#         x = self.conv_1(x)
+#         x = x.permute(0, 2, 1)
+#         return x
+    
+
+
 class Temporal(nn.Module):
     def __init__(self, input_size, out_size):
         super(Temporal, self).__init__()
-        self.conv_1 = nn.Sequential(
-            nn.Conv1d(in_channels=input_size, out_channels=out_size, kernel_size=3,
-                    stride=1, padding=1),
-            nn.ReLU(),
-        )
+        self.fc1 = nn.Linear(input_size, out_size)
+
     def forward(self, x):
-        x = x.permute(0, 2, 1)
-        x = self.conv_1(x)
-        x = x.permute(0, 2, 1)
+        x = self.fc1(x)
         return x
 
 
@@ -183,16 +202,14 @@ class GraphClassifiction(nn.Module):
     def get_scores(self, x, ncrops=None):
 
 
-        outputs = self.normal_head(x)
-        normal_scores = outputs[-1]  # [5, 1, 67]
-        xhs = outputs[:-1]  # xhs[0]: [5, 32, 67]  xhs[1]: [5, 16, 67]
+        scores = self.normal_head(x)
 
         if ncrops:
-            b = normal_scores.shape[0] // ncrops
-            normal_scores = normal_scores.view(b, ncrops, -1).mean(1)
+            b = scores.shape[0] // ncrops
+            scores = scores.view(b, ncrops, -1).mean(1)
 
-        #  normal_scores: [5, 67]
-        return xhs, normal_scores
+        #  scores: [5, 67]
+        return scores
 
 
     def forward(self, v_feature, t_feature):
@@ -203,8 +220,8 @@ class GraphClassifiction(nn.Module):
         ft = t_feature.view(b*c, t, feat_t)
 
 
-        fv = self.embedding_v(fv)
-        ft = self.embedding_t(ft)
+        # fv = self.embedding_v(fv)
+        # ft = self.embedding_t(ft)
 
 
 
@@ -227,10 +244,10 @@ class GraphClassifiction(nn.Module):
         # at = a_fused
         # fusion_matrix = a_fused
 
-        normal_feats, normal_scores = self.get_scores(a_fused, ncrops=c)
+        scores = self.get_scores(a_fused, ncrops=c)
 
         if b*c == 10:
-            return normal_scores, av, at, a_fused
+            return scores, av, at, a_fused
 
         fusion_resutls = dict(
             fused_graphs=a_fused,
@@ -239,7 +256,7 @@ class GraphClassifiction(nn.Module):
         )
 
         return {
-            'scores': normal_scores,
+            'scores': scores,
             'bn_results': fusion_resutls,
             'fusion_matrix': fusion_matrix
         }
