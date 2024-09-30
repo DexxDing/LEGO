@@ -27,15 +27,13 @@ class MeanLoss(nn.Module):
             a_nor = g_nor[i]
             a_abn = g_abn[i]
 
-
-            mask_nor = a_nor > self.threshold
-            mask_abn = a_abn > self.threshold
+            mask_nor = a_nor >= self.threshold
+            mask_abn = a_abn >= self.threshold
 
             a_nor = a_nor * mask_nor.float()
             a_abn = a_abn * mask_abn.float()
 
             # pdb.set_trace()
-
 
             deg_nor = torch.sum(a_nor, dim=-1)
             topk_abn = torch.topk(a_abn, k=self.k, dim=-1)[0]
@@ -47,16 +45,11 @@ class MeanLoss(nn.Module):
             mean_nors_nor.append(mean_nor)
             mean_nors_abn.append(mean_abn)
 
-
         loss_mean_abn = sum(mean_nors_abn) / (b // 2)
         loss_mean_nor = sum(mean_nors_nor) / (b // 2)
 
-
-
-        loss_mean = loss_mean_nor - loss_mean_abn
+        loss_mean = torch.norm(loss_mean_nor - loss_mean_abn)
 
         # pdb.set_trace()
 
-
         return loss_mean
-

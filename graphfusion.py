@@ -7,11 +7,16 @@ import torch.nn.functional as F
 import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
+
+import option
 from normal_head import NormalHead
 import itertools
 
+
 torch.manual_seed(4869)
 
+
+args = option.parser.parse_args()
 
 def check_for_nan(tensor, name):
     if torch.isnan(tensor).any():
@@ -30,12 +35,18 @@ def check_for_inf(tensor, name):
 
 
 
+class Fusion(nn.Module):
+    def __init__(self, d_1, d_2):
+        super(Fusion, self).__init__()
+        self.fc1 = nn.Linear(d_1, 1)
+        self.fc2 = nn.Linear(d_2, 1)
 
-
-
-
-logging.basicConfig(level=logging.INFO, format='%(message)s',
-                        handlers=[logging.FileHandler("ucf_training_log.txt", mode='w'), logging.StreamHandler()])
+    def forward(self, x):
+        x = x.permute(1, 2, 3, 4, 0)
+        x = self.fc1(x).squeeze(-1)
+        x = x.permute(1, 2, 3, 0)
+        x = self.fc2(x).squeeze(-1)
+        return x
 
 class GraphFusion(nn.Module):
     def __init__(self, batch, m, n):
@@ -47,6 +58,8 @@ class GraphFusion(nn.Module):
         self.sigmoid = nn.Sigmoid()
         # self.a = nn.Parameter(torch.rand(self.m, self.n))
         # self.a = nn.Parameter(torch.abs(torch.normal(mean=0, std=1, size=(self.m, self.n))))
+        if args.go == 'fc':
+            self.fusion = Fusion(self.m, self.n)
 
 
 
@@ -55,7 +68,7 @@ class GraphFusion(nn.Module):
 
     def forward(self, fv, ft):
 
-        fusion_operator = self.relu(self.a)
+        fusion_operator = self.sigmoid(self.a)
 
         # set flag for testing
         test = False
@@ -132,7 +145,19 @@ class GraphFusion(nn.Module):
         # av_powers = av_powers.permute(1, 2, 3, 0)
         # at_powers = at_powers.permute(1, 0, 2, 3)
 
-        pow_product = av_powers.unsqueeze(1) * at_powers.unsqueeze(0)
+
+
+
+
+
+        pow_product = av_powers.unsqueeze(1) * at_powers.unsqueeze(0)   # [m, n, b, seg, seg]
+
+        if args.go == 'fc':
+            a_fused = self.fusion(pow_product)
+            a_max = torch.max(a_fused)
+            a_fused = a_fused / (a_max + 1e-10)
+            fusion_matrix = a_fused
+            return a_v, a_t, a_fused, fusion_matrix  # [b*c, seg, feat(seg)]
 
         a_fused = (pow_product * fusion_operator).sum(dim=(0, 1), keepdim=False)
 
@@ -147,7 +172,7 @@ class GraphFusion(nn.Module):
 
 
         # a_fused = a_v * a_t
-        a_fused = self.sigmoid(a_fused)
+        # a_fused = self.sigmoid(a_fused)
         # a_fused = self.relu(a_fused)
         # a_fused = a_v
         a_max = torch.max(a_fused)
@@ -190,6 +215,7 @@ class Temporal(nn.Module):
 
 
 
+
 class GraphClassifiction(nn.Module):
     def __init__(self, batch_size, m, n):
         super(GraphClassifiction, self).__init__()
@@ -220,8 +246,8 @@ class GraphClassifiction(nn.Module):
         ft = t_feature.view(b*c, t, feat_t)
 
 
-        # fv = self.embedding_v(fv)
-        # ft = self.embedding_t(ft)
+        fv = self.embedding_v(fv)
+        ft = self.embedding_t(ft)
 
 
 

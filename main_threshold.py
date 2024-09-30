@@ -12,7 +12,7 @@ import graphfusion
 import torch.nn as nn
 from normal_loss import NormalLoss
 from variance_loss import VarianceLoss
-from con_loss import Connectivity_loss
+import logging
 import pdb
 import itertools
 import matplotlib.pyplot as plt
@@ -21,9 +21,8 @@ import wandb
 
 
 if __name__ == '__main__':
-    torch.manual_seed(4869)
     args = option.parser.parse_args()
-    config = Config(args)
+    args.wandb = False
     seed_everything(args.seed)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -43,8 +42,21 @@ if __name__ == '__main__':
                              pin_memory=False)
 
 
-    viz_name = 'BNGF'
-    viz = Visualizer(env=viz_name, use_incoming_socket=False)
+    os.makedirs('ckpt', exist_ok=True)
+    args = option.parser.parse_args()
+    os.makedirs('logs', exist_ok=True)
+    paren_dir = "logs"
+    dir_path = f"{args.dataset}"
+    log_path = os.path.join(paren_dir, dir_path)
+    os.makedirs(log_path, exist_ok=True)
+    logging.basicConfig(level=logging.INFO, format='%(message)s',
+                        handlers=[logging.FileHandler(f"{args.dataset}-log-{args.ablation}.txt", mode='w'),
+                                  logging.StreamHandler()])
+
+
+    ckpt_parent = "ckpt"
+    dataset_ckpt_path = os.path.join(ckpt_parent, f"{args.dataset}_{args.ablation}ckpt")
+    os.makedirs(dataset_ckpt_path, exist_ok=True)
 
     class CombinedLossThreshold(nn.Module):
         def __init__(self, threshold, w_normal=1., w_var=1.,  k=10):
@@ -76,26 +88,32 @@ if __name__ == '__main__':
             return loss['total_loss'], loss
 
     # testing mix loss coefficient
-    thresholds = np.linspace(0., 0.9, 25).tolist()
+    thresholds = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
     for i in range(len(thresholds)):
         threshold = thresholds[i]
         m = 4
         n = 4
         plot_label = str(f"{args.dataset}: threshold:{threshold}")
-        wandb.init(
-            project="GraphFusion",
-            name=f"{plot_label}_threshold-ablation",
-            reinit=True
-        )
+        if args.wandb:
+            wandb.init(
+                project="GraphFusion",
+                name=f"{plot_label}_threshold-ablation",
+                reinit=True
+            )
         model = graphfusion.GraphClassifiction(batch_size=32, m=m, n=n)
         criterion = CombinedLossThreshold(threshold=threshold)
         optimizer = optim.Adam(model.parameters(),
-                               lr=0.001, weight_decay=1e-3)
+                               lr=args.lr, weight_decay=args.wd)
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
-        train(train_nloader, train_aloader, test_loader, model, optimizer, criterion, device, viz, args, scheduler,
-              m, n, save_dir='./ckpt', num_epochs=5)
 
-        wandb.finish()
+        logging_message_test = f"threshold setup: m={m}, n={n}, w_var=1., threshold={threshold}, k=10"
+        logging.info(logging_message_test)
+
+        train(train_nloader, train_aloader, test_loader, model, optimizer, criterion, device, args, scheduler,
+              m, n, save_dir=f'./ckpt/{args.dataset}_ckpt', num_epochs=args.epoch)
+
+        if args.wandb:
+            wandb.finish()
 
 
 
