@@ -8,6 +8,7 @@ import logging
 from sklearn.metrics import accuracy_score, f1_score
 from webencodings import labels
 
+import option
 from test_10crop import test
 import torch.nn.functional as F
 import itertools
@@ -17,8 +18,8 @@ import seaborn as sns
 
 torch.manual_seed(4869)
 
-logging.basicConfig(level=logging.INFO, format='%(message)s',
-                        handlers=[logging.FileHandler("ucf_training_log.txt", mode='w'), logging.StreamHandler()])
+
+
 
 
 def check_for_nan(tensor, name):
@@ -37,13 +38,18 @@ def check_for_inf(tensor, name):
         print(f"No Inf values found in {name}")
 
 
+args = option.parser.parse_args()
+os.makedirs('logs', exist_ok=True)
+paren_dir = "logs"
+dir_path = f"{args.dataset}"
+log_path = os.path.join(paren_dir, dir_path)
+os.makedirs(log_path, exist_ok=True)
+logging.basicConfig(level=logging.INFO, format='%(message)s',
+                        handlers=[logging.FileHandler(f"{args.dataset}-log-{args.ablation}.txt", mode='w'), logging.StreamHandler()])
 
 
 
-
-
-
-def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion, device, viz, args, scheduler, m , n, save_dir=None, num_epochs=10):
+def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion, device, args, scheduler, m , n, save_dir=None, num_epochs=10):
     with ((torch.set_grad_enabled(True))):
 
         for epoch in range(num_epochs):
@@ -150,8 +156,8 @@ def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion
                 acc_sum += acc
 
             fusion_matrix = fusion_matrix.detach().cpu().numpy()
-            fusion_matrix_path = f"./fusion_matrix/fusion_matrix_{epoch+1}_{args.dataset}_m{m}_n{n}.npy"
-            np.save(fusion_matrix_path, fusion_matrix)
+            # fusion_matrix_path = f"./fusion_matrix/fusion_matrix_{epoch+1}_{args.dataset}_m{m}_n{n}.npy"
+            # np.save(fusion_matrix_path, fusion_matrix)
 
 
 
@@ -163,38 +169,18 @@ def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion
             # viz.plot_lines('loss', average_loss, flag, color=color, label=plot_label)
             # viz.plot_lines('train acc', avg_acc)
 
-            wandb.log({
-                "Loss": average_loss,
-            }, step=epoch + 1)
-
-            # fig, ax = plt.subplots(figsize=(8, 6))
-            # sns.heatmap(
-            #     fusion_matrix,
-            #     annot=True,
-            #     fmt=".2f",
-            #     cmap='coolwarm',  # Diverging color map suitable for negative and positive values
-            #     center=0,  # Center the colormap at zero
-            #     ax=ax,
-            #     cbar=True,
-            #     linewidths=.5,  # Add lines between cells for clarity
-            #     linecolor='gray'
-            # )
-            # ax.set_title(f'Fusion Matrix - Epoch {epoch + 1}')
-            # ax.set_xlabel('Matrix Column')
-            # ax.set_ylabel('Matrix Row')
-
-            # Log the heatmap image to wandb
-            # wandb.log({"Fusion Matrix": wandb.Image(fig)})
-
-            # plt.close(fig)
+            if args.wandb:
+                wandb.log({
+                    "Loss": average_loss,
+                }, step=epoch + 1)
 
 
 
-            model_path = os.path.join(save_dir, f'model_epoch_{epoch + 1}_{average_loss:.4f}.pth')
+            model_path = os.path.join(save_dir, f'{args.dataset}_model_epoch_{epoch + 1}_{average_loss:.4f}.pth')
             model_state = model.state_dict()
             torch.save(model_state, model_path)
-            graph_path = f'./graphs/graph{args.dataset}_epoch{epoch}_'
-            torch.save(a_fused, graph_path)
+            # graph_path = f'./graphs/graph{args.dataset}_epoch{epoch}_'
+            # torch.save(a_fused, graph_path)
 
             if (epoch + 1) % 1 == 0:
                 model.eval()
@@ -204,15 +190,15 @@ def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion
                     model.to(device)
                     test_auc, test_ap = test(test_loader, model, args, device, epoch)
                 print(f"Epoch {epoch + 1} Test AUC: {test_auc:.4f}, Test AP: {test_ap:.4f}")
-                # viz.plot_lines('test auc', test_auc)
-                wandb.log({
-                    "Test AUC": test_auc
-                }, step=epoch + 1)
+                if args.wandb:
+                    wandb.log({
+                        "Test AUC": test_auc
+                    }, step=epoch + 1)
 
-                # viz.plot_lines('test ap', test_ap, color=color, label=plot_label)
-                wandb.log({
-                    "Test AP": test_ap
-                }, step=epoch + 1)
+                if args.wandb:
+                    wandb.log({
+                        "Test AP": test_ap
+                    }, step=epoch + 1)
 
-                logging_message_test = f"Epoch {epoch + 1} Test AUC: {test_auc:.4f}, Test AP: {test_ap:.4f}"
+                logging_message_test = f"Task {args.ablation} Epoch {epoch + 1} Test AUC: {test_auc:.4f}, Test AP: {test_ap:.4f}"
                 logging.info(logging_message_test)

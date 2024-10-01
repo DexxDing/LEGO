@@ -82,6 +82,8 @@ def test(loader, model, args, device, epoch):
             v_features = v_features[:, :, :cut, :]
             t_features = t_features[:, :, :cut, :]
 
+
+
             num_segments = v_features.shape[2]
 
             v_features = v_features.view(-1, num_segments, feature_dim)
@@ -139,7 +141,7 @@ def test(loader, model, args, device, epoch):
                 # snippet_scores = torch.squeeze(snippet_scores, 1)
                 print('snippet scores dimension', snippet_scores.shape)
 
-                # a_fused = a_fused.detach().cpu().numpy()
+                a_fused = a_fused.detach().cpu().numpy()
                 # graph_path = f"./graphs/graph_{args.dataset}-{epoch}-batch{batch_index}1.npy"
                 # np.save(graph_path, a_fused)
                 #
