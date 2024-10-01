@@ -55,10 +55,10 @@ import torch.nn as nn
 
 
 class NormalHead(nn.Module):
-    def __init__(self):
+    def __init__(self, input_dim1=32, output_dim1=32):
         super(NormalHead, self).__init__()
-        self.fc1 = nn.Linear(32, 32)
-        self.fc2 = nn.Linear(32, 1)
+        self.fc1 = nn.Linear(input_dim1, output_dim1)
+        self.fc2 = nn.Linear(input_dim1, 1)
         self.relu = nn.ReLU()
         self.bn = nn.BatchNorm1d(32)
         self.sigmoid = nn.Sigmoid()
