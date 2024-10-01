@@ -23,6 +23,10 @@ parser.add_argument('--epoch', type=int, default=50, help='graph operation type'
 parser.add_argument('--wandb', type=bool, default=False, help='graph operation type')
 parser.add_argument('--lr', type=float, default=0.001, help='learning rates for steps(list form)')
 parser.add_argument('--wd', type=float, default=1e-3, help='learning rates for steps(list form)')
+parser.add_argument('--m', type=int, default=4, help='graph operator dimension')
+parser.add_argument('--n', type=int, default=4, help='graph operator dimension')
+parser.add_argument('--modality', default='av', help='modality')
+
 
 
 
