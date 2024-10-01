@@ -159,28 +159,28 @@ class GraphFusion(nn.Module):
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix  # [b*c, seg, feat(seg)]
 
-        if args.modality == 'fv':
+        if args.modal == 'fv':
             a_fused = f_v
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix
 
-        if args.modality == 'ft':
+        if args.modal == 'ft':
             a_fused = f_t
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix
 
-        if args.modality == 'fv+ft':
+        if args.modal == 'fv+ft':
             a_fused = f_v + f_t
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix
 
-        if args.modality == 'fv*ft':
+        if args.modal == 'fv*ft':
             a_fused = f_v * f_t
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix
 
 
-        if args.modality == 'fv(cat)ft':
+        if args.modal == 'fv(cat)ft':
             a_fused = torch.cat([f_v, f_t], dim=0)
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix
@@ -188,35 +188,35 @@ class GraphFusion(nn.Module):
 
 
 
-        if args.modality == 'av':
+        if args.modal == 'av':
             a_fused = a_v
             a_max = torch.max(a_fused)
             a_fused = a_fused / (a_max + 1e-10)
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix  # [b*c, seg, feat(seg)]
 
-        if args.modality == 'at':
+        if args.modal == 'at':
             a_fused = a_t
             a_max = torch.max(a_fused)
             a_fused = a_fused / (a_max + 1e-10)
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix  # [b*c, seg, feat(seg)]
 
-        if args.modality == 'av+at':
+        if args.modal == 'av+at':
             a_fused = a_v + a_t
             a_max = torch.max(a_fused)
             a_fused = a_fused / (a_max + 1e-10)
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix  # [b*c, seg, feat(seg)]
 
-        if args.modality == 'av*at':
+        if args.modal == 'av*at':
             a_fused = a_v * a_t
             a_max = torch.max(a_fused)
             a_fused = a_fused / (a_max + 1e-10)
             fusion_matrix = a_fused
             return a_v, a_t, a_fused, fusion_matrix  # [b*c, seg, feat(seg)]
 
-        if args.modality == 'av(cat)at':
+        if args.modal == 'av(cat)at':
             a_fused = torch.cat([a_v, a_t], dim=-1)
             a_max = torch.max(a_fused)
             a_fused = a_fused / (a_max + 1e-10)
@@ -289,7 +289,7 @@ class GraphClassifiction(nn.Module):
         self.embedding_t = Temporal(input_size=768, out_size=32)
         self.graphfusion = GraphFusion(batch=batch_size, m=m, n=n)
         self.normal_head = NormalHead(input_dim1=32)
-        if args.modality == 'av(cat)at' or args.modality == 'fv(cat)ft':
+        if args.modal == 'av(cat)at' or args.modal == 'fv(cat)ft':
             self.normal_head = NormalHead(input_dim1=64)
 
 
