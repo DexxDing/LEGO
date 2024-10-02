@@ -5,13 +5,15 @@ import numpy as np
 from utils import process_feat, get_rgb_list_file
 import torch
 from torch.utils.data import DataLoader
-# torch.set_default_tensor_type('torch.cuda.FloatTensor')
+torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 
 class Dataset(data.Dataset):
     def __init__(self, args, is_normal=True, transform=None, test_mode=False):
         self.modality = args.modality
         self.emb_folder = args.emb_folder
+        self.c3d_folder = args.c3d_folder
+        self.swin_folder = args.swin_folder
         self.is_normal = is_normal
         self.dataset = args.dataset
         self.feature_size = args.feature_size
@@ -125,6 +127,8 @@ class Dataset(data.Dataset):
             text_path = "save/Crime/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
         elif 'shanghai' in self.dataset:
             text_path = "save/Shanghai/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
+            c3d_path = "save/Shanghai/" + self.c3d_folder + "/" + i3d_path.split("/")[-1][:-7]+"c3d.npy"
+            swin_path = "save/Shanghai/" + self.swin_folder + "/" + i3d_path.split("/")[-1][:-7]+"swin.npy"
         elif 'violence' in self.dataset:
             text_path = "save/Violence/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
         elif 'ped2' in self.dataset:
@@ -137,30 +141,45 @@ class Dataset(data.Dataset):
             text_path = "save/StreetScene/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
         elif 'combine' in self.dataset:
             text_path = "save/Combine/" + self.emb_folder + "/" + i3d_path.split("/")[-1][:-7]+"emb.npy"
+
         else:
             raise Exception("Dataset undefined!!!")
-        
         text_features = np.load(text_path, allow_pickle=True)
         text_features = np.array(text_features, dtype=np.float32)  # [snippet no., 768]
+
+        c3d_features = np.load(c3d_path, allow_pickle=True)
+        c3d_features = np.array(c3d_features, dtype=np.float32)  # [snippet no., 4096]
+
+        swin_features = np.load(swin_path, allow_pickle=True)
+        swin_features = np.array(swin_features, dtype=np.float32)  # [snippet no., 4096]
+
         # assert features.shape[0] == text_features.shape[0]
         if self.feature_size == 1024:
             text_features = np.tile(text_features, (5, 1, 1))  # [10,snippet no.,768]
         elif self.feature_size == 2048:
             text_features = np.tile(text_features, (10, 1, 1))  # [10,snippet no.,768]
+            c3d_features = np.tile(c3d_features, (10, 1, 1))
+            swin_features = np.tile(swin_features, (10, 1, 1))
         else:
             raise Exception("Feature size undefined!!!")
+
+
+
+
+
 
         if self.tranform is not None:
             features = self.tranform(features)
 
         if self.test_mode:
             text_features = text_features.transpose(1, 0, 2)  # [snippet no.,10,768]
-            return features, text_features
+            c3d_features = c3d_features.transpose(1, 0, 2)
+            swin_features = swin_features.transpose(1, 0, 2)
+            return features, c3d_features, swin_features, text_features, 
         else:
             # process 10-cropped snippet feature
             features = features.transpose(1, 0, 2)  # [snippet no., 10, 2048] -> [10, snippet no., 2048]
-            #TODO: check this
-            # print('feature dimension', features.shape)
+            print('feature dimension', features.shape)
             divided_features = []
             for feature in features:  # loop 10 times
                 feature = process_feat(feature, 32)  # divide a video into 32 segments/snippets/clips
@@ -173,7 +192,23 @@ class Dataset(data.Dataset):
                 div_feat_text.append(text_feat)
             div_feat_text = np.array(div_feat_text, dtype=np.float32)
             assert divided_features.shape[1] == div_feat_text.shape[1], str(self.test_mode) + "\t" + str(divided_features.shape[1]) + "\t" + div_feat_text.shape[1]
-            return divided_features, div_feat_text, label
+
+
+            div_c3d_feat = []
+            for c3d_feat in c3d_features:
+                c3d_feat = process_feat(c3d_feat, 32)  # [32,768]
+                div_c3d_feat.append(c3d_feat)
+            div_c3d_feat = np.array(div_c3d_feat, dtype=np.float32)
+            assert divided_features.shape[1] == div_c3d_feat.shape[1], str(self.test_mode) + "\t" + str(divided_features.shape[1]) + "\t" + div_c3d_feat.shape[1]
+        
+
+            div_swin_feat = []
+            for swin_feat in swin_features:
+                swin_feat = process_feat(swin_feat, 32)  # [32,768]
+                div_swin_feat.append(swin_feat)
+            div_swin_feat = np.array(div_swin_feat, dtype=np.float32)
+            assert divided_features.shape[1] == div_swin_feat.shape[1], str(self.test_mode) + "\t" + str(divided_features.shape[1]) + "\t" + div_swin_feat.shape[1]
+            return divided_features, div_c3d_feat, div_swin_feat, div_feat_text, label
 
     def get_label(self):
 
