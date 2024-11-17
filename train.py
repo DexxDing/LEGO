@@ -14,6 +14,7 @@ import itertools
 import wandb
 import matplotlib.pyplot as plt
 import seaborn as sns
+import random
 
 torch.manual_seed(4869)
 
@@ -43,7 +44,7 @@ def check_for_inf(tensor, name):
 
 
 
-def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion, device, viz, args, scheduler, m , n, save_dir=None, num_epochs=10):
+def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion, device, args, scheduler, m , n, save_dir=None, num_epochs=10):
     with ((torch.set_grad_enabled(True))):
 
         for epoch in range(num_epochs):
@@ -75,25 +76,60 @@ def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion
                 batch_idx += 1
                 print(f'Batch {batch_idx}')
 
-                v_features_n, t_features_n, labels_n = [n.to(device) for n in batch_n]
-                v_features_a, t_features_a, labels_a = [a.to(device) for a in batch_a]
+                v_features_n, v_features_n2, v_features_n3, v_features_n4, t_features_n, labels_n = [n.to(device) for n in batch_n]
+                v_features_a, v_features_a2, v_features_a3, v_features_a4, t_features_a, labels_a = [a.to(device) for a in batch_a]
 
 
                 cut = min(v_features_n.shape[0], v_features_a.shape[0])
-                v_features_n, t_features_n, labels_n = v_features_n[:cut], t_features_n[:cut], labels_n[:cut]
-                v_features_a, t_features_a, labels_a = v_features_a[:cut], t_features_a[:cut], labels_a[:cut]
+                v_features_n, v_features_n2, v_features_n3, v_features_n4, t_features_n, labels_n = v_features_n[:cut], v_features_n2[:cut], v_features_n3[:cut], v_features_n4[:cut], \
+                    t_features_n[:cut], labels_n[:cut]
+                v_features_a, v_features_a2, v_features_a3, v_features_a4, t_features_a, labels_a = v_features_a[:cut], v_features_a2[:cut], v_features_a3[:cut], v_features_a4[:cut], \
+                    t_features_a[:cut], labels_a[:cut]
 
 
                 cut_snippet = min(v_features_n.shape[2], v_features_a.shape[2])
-                v_features_n, t_features_n = v_features_n[:, :, :cut_snippet, :], \
-                                            t_features_n[:, :, :cut_snippet, :]
-                v_features_a, t_features_a = v_features_a[:, :, :cut_snippet, :], \
-                                            t_features_a[:, :, :cut_snippet, :]
+                v_features_n, v_features_n2, v_features_n3, v_features_n4, t_features_n = v_features_n[:, :, :cut_snippet, :], \
+                                                                            v_features_n2[:, :, :cut_snippet, :],\
+                                                                            v_features_n3[:, :, :cut_snippet, :],\
+                                                                            v_features_n4[:, :, :cut_snippet, :],\
+                                                                            t_features_n[:, :, :cut_snippet, :]
+                v_features_a, v_features_a2, v_features_a3, v_features_a4, t_features_a = v_features_a[:, :, :cut_snippet, :], \
+                                                                            v_features_a2[:, :, :cut_snippet, :],\
+                                                                            v_features_a3[:, :, :cut_snippet, :],\
+                                                                            v_features_a4[:, :, :cut_snippet, :],\
+                                                                            t_features_a[:, :, :cut_snippet, :]
 
                 v_features = torch.cat((v_features_n, v_features_a), dim=0)
+                # v_features2 = torch.cat((v_features_n2, v_features_a2), dim=0)
+                # v_features3 = torch.cat((v_features_n3, v_features_a3), dim=0)
+                v_features4 = torch.cat((v_features_n4, v_features_a4), dim=0)
                 t_features = torch.cat((t_features_n, t_features_a), dim=0)
 
                 labels = torch.cat((labels_n, labels_a), dim=0)
+
+
+                dim0, dim1, dim2, dim3 = v_features4.shape
+                # create a noise feature here
+                v_features4 = torch.rand(dim0, dim1, dim2, dim3)
+
+
+
+
+                # feature_list = [v_features, v_features2, v_features3, t_features]
+                feature_list = [v_features, v_features4, t_features]
+
+
+                selected_indices = random.sample(range(len(feature_list)), 2)
+
+                selected_features = [feature_list[i] for i in selected_indices]
+
+                indices = list(selected_indices)
+
+
+
+
+
+
 
 
 
@@ -101,10 +137,12 @@ def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion
                 t_features.requires_grad = False
 
 
-                print('Batch dimension: ', v_features.shape, t_features.shape)
+                print('Batch dimension: ', selected_features[0].shape, selected_features[1].shape)
+
+                # pdb.set_trace()
 
 
-                output = model(v_features, t_features)
+                output = model(selected_features, indices=indices)
                 scores = torch.max(output['scores'], dim=-1)[0]
                 scores = scores.detach().cpu().numpy()
                 fusion_matrix = output['fusion_matrix']
@@ -209,10 +247,10 @@ def train(train_nloader, train_aloader, test_loader, model, optimizer, criterion
                     "Test AUC": test_auc
                 }, step=epoch + 1)
 
-                # viz.plot_lines('test ap', test_ap, color=color, label=plot_label)
-                wandb.log({
-                    "Test AP": test_ap
-                }, step=epoch + 1)
+                # # viz.plot_lines('test ap', test_ap, color=color, label=plot_label)
+                # wandb.log({
+                #     "Test AP": test_ap
+                # }, step=epoch + 1)
 
                 logging_message_test = f"Epoch {epoch + 1} Test AUC: {test_auc:.4f}, Test AP: {test_ap:.4f}"
                 logging.info(logging_message_test)

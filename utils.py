@@ -274,6 +274,63 @@ def get_rgb_list_file(ds, is_test):
         raise ValueError("dataset should be either ucf, shanghai, or violence")
     return ds_name, rgb_list_file
 
+def get_rgb_list_file(ds, is_test):
+    if "ucf" in ds:
+        ds_name = "Crime"
+        if is_test:
+            rgb_list_file = 'list/ucf-i3d-test.list'
+        else:
+            rgb_list_file = 'list/ucf-i3d.list'
+    elif "shanghai" in ds:
+        ds_name = "Shanghai"
+        if is_test:
+            rgb_list_file = 'list/shanghai-i3d-test-10crop.list'
+        else:
+            rgb_list_file = 'list/shanghai-i3d-train-10crop.list'
+    elif "violence" in ds:
+        ds_name = "Violence"
+        if is_test:
+            rgb_list_file = 'list/violence-i3d-test.list'
+        else:
+            rgb_list_file = 'list/violence-i3d.list'
+    elif "ped2" in ds:
+        ds_name = "UCSDped2"
+        if is_test:
+            rgb_list_file = 'list/ped2-i3d-test.list'
+        else:
+            rgb_list_file = 'list/ped2-i3d.list'
+    elif "TE2" in ds:
+        ds_name = "TE2"
+        if is_test:
+            rgb_list_file = 'list/te2-i3d-test.list'
+        else:
+            rgb_list_file = 'list/te2-i3d.list'
+
+    elif "ave" in ds:
+        ds_name = "ave"
+        if is_test:
+            rgb_list_file = 'list/ave-i3d-test.list'
+        else:
+            rgb_list_file = 'list/ave-i3d.list'
+
+    elif "street" in ds:
+        ds_name = "street"
+        if is_test:
+            rgb_list_file = 'list/street-i3d-test.list'
+        else:
+            rgb_list_file = 'list/street-i3d.list'
+
+    elif "combine" in ds:
+        ds_name = "combine"
+        if is_test:
+            rgb_list_file = 'list/combined-ped2-sh2-test.list'
+        else:
+            rgb_list_file = 'list/combined-ped2-sh2.list'
+
+    else:
+        raise ValueError("dataset should be either ucf, shanghai, or violence")
+    return ds_name, rgb_list_file
+
 def get_gt(ds, gt_file):
     if gt_file is not None:
         gt = np.load(gt_file)

@@ -37,13 +37,13 @@ def get_metrics(frame_predict, frame_gt):
     return metrics
 
 
-def get_predicts(fv, ft, net):
+def get_predicts(feat_list, net):
     frame_predict = []
 
 
-    fv = fv.cuda()
-    ft = ft.cuda()
-    res, av, at, a_fused = net(fv, ft)
+    # fv = fv.cuda()
+    # ft = ft.cuda()
+    res, av, at, a_fused = net(feat_list)
 
     a_predict = res.cpu().numpy().mean(0)
 
@@ -69,9 +69,14 @@ def test(loader, model, args, device, epoch):
         for batch_index, batch_features in enumerate(loader):
             # if batch_index < 3 and batch_index > 0:
             print(f'Batch {batch_index + 1}')
-            v_features, t_features = [tensor.to(device) for tensor in batch_features]
+            v_features, v_features2, v_features3, v_features4, t_features = [tensor.to(device) for tensor in batch_features]
+
+
             v_features = v_features.permute(0, 2, 1, 3)
             t_features = t_features.permute(0, 2, 1, 3)
+            v_features2 = v_features2.permute(0, 2, 1, 3)
+            v_features3 = v_features3.permute(0, 2, 1, 3)
+            v_features4 = v_features4.permute(0, 2, 1, 3)
 
 
             original_batch, crops, num_segments, feature_dim = v_features.shape
@@ -80,12 +85,27 @@ def test(loader, model, args, device, epoch):
             # pdb.set_trace()
             cut = min(v_features.shape[2], t_features.shape[2])
             v_features = v_features[:, :, :cut, :]
+            v_features2 = v_features2[:, :, :cut, :]
+            v_features3 = v_features3[:, :, :cut, :]
+            v_features4 = v_features4[:, :, :cut, :]
             t_features = t_features[:, :, :cut, :]
+
+            # pdb.set_trace()
 
             num_segments = v_features.shape[2]
 
             v_features = v_features.view(-1, num_segments, feature_dim)
+            v_features2 = v_features2.view(-1, num_segments, v_features2.shape[3])
+            v_features3 = v_features3.view(-1, num_segments, v_features3.shape[3])
+            v_features4 = v_features4.view(-1, num_segments, v_features4.shape[3])
             t_features = t_features.view(-1, num_segments, feature_dim_t)
+
+            # add noise
+            dim0, dim1, dim2 = v_features4.shape
+            # create a noise feature here
+            v_features4 = torch.rand(dim0, dim1, dim2)
+
+
             print(f'feature size before padding, {v_features.shape}, {t_features.shape}')
 
             # sample out the gt for the given video
@@ -105,21 +125,28 @@ def test(loader, model, args, device, epoch):
 
 
                 v_features = v_features.repeat(1, repeat_times, 1)[:, :window_size, :]
+                v_features2 = v_features2.repeat(1, repeat_times, 1)[:, :window_size, :]
+                v_features3 = v_features3.repeat(1, repeat_times, 1)[:, :window_size, :]
+                v_features4 = v_features4.repeat(1, repeat_times, 1)[:, :window_size, :]
                 t_features = t_features.repeat(1, repeat_times, 1)[:, :window_size, :]
 
                 print(f'feature size, {v_features.shape}, {t_features.shape}')
 
                 v_features = v_features.view(1, crops, v_features.shape[1], v_features.shape[2])
+                v_features2 = v_features2.view(1, crops, v_features2.shape[1], v_features2.shape[2])
+                v_features3 = v_features3.view(1, crops, v_features3.shape[1], v_features3.shape[2])
+                v_features4 = v_features4.view(1, crops, v_features4.shape[1], v_features4.shape[2])
                 t_features = t_features.view(1, crops, t_features.shape[1], t_features.shape[2])
 
 
-                f_v = v_features.squeeze(0)
-                f_v = F.normalize(f_v, p=2, dim=2)
-                f_t = t_features.squeeze(0)
-                f_t = F.normalize(f_t, p=2, dim=2)
 
-                a_v = (torch.bmm(f_v, f_v.transpose(1, 2)))
-                a_t = (torch.bmm(f_t, f_t.transpose(1, 2)))
+                # f_v = v_features.squeeze(0)
+                # f_v = F.normalize(f_v, p=2, dim=2)
+                # f_t = t_features.squeeze(0)
+                # f_t = F.normalize(f_t, p=2, dim=2)
+                #
+                # a_v = (torch.bmm(f_v, f_v.transpose(1, 2)))
+                # a_t = (torch.bmm(f_t, f_t.transpose(1, 2)))
 
                 # av = a_v.detach().cpu().numpy()
                 # av_path = f"./graphs/train/av/av_{args.dataset}_{batch_index}1.npy"
@@ -132,9 +159,13 @@ def test(loader, model, args, device, epoch):
 
                 # pdb.set_trace()
 
+                # feature_list = [v_features, v_features2, v_features3, t_features]
+                feature_list = [v_features, v_features4, t_features]
+
+
 
                 # get snippet level results
-                snippet_scores, av, at, a_fused = get_predicts(v_features, t_features, model)
+                snippet_scores, av, at, a_fused = get_predicts(feature_list, model)
                 # check_for_nan(snippet_scores, 'snippet_scores')
                 # snippet_scores = torch.squeeze(snippet_scores, 1)
                 print('snippet scores dimension', snippet_scores.shape)
@@ -166,6 +197,9 @@ def test(loader, model, args, device, epoch):
                         # shift back padding
                         start_idx = num_segments - window_size
                         v_window = v_features[:, start_idx:num_segments, :]
+                        v_window2 = v_features2[:, start_idx:num_segments, :]
+                        v_window3 = v_features3[:, start_idx:num_segments, :]
+                        v_window4 = v_features4[:, start_idx:num_segments, :]
                         t_window = t_features[:, start_idx:num_segments, :]
                         print(f'v_window.shape: {v_window.shape}, t_window.shape: {t_window.shape}')
 
@@ -175,13 +209,26 @@ def test(loader, model, args, device, epoch):
                     else:
                         # sliding window for segments > 32 and can be divided by 32
                         v_window = v_features[:, i:end_idx, :]
+                        v_window2 = v_features2[:, i:end_idx, :]
+                        v_window3 = v_features3[:, i:end_idx, :]
+                        v_window4 = v_features4[:, i:end_idx, :]
                         t_window = t_features[:, i:end_idx, :]
                         print(f'v_window.shape: {v_window.shape}, t_window.shape: {t_window.shape}')
 
 
                     v_window = v_window.view(1, crops, v_window.shape[1], v_window.shape[2])
+                    v_window2 = v_window2.view(1, crops, v_window2.shape[1], v_window2.shape[2])
+                    v_window3 = v_window3.view(1, crops, v_window3.shape[1], v_window3.shape[2])
+                    v_window4 = v_window4.view(1, crops, v_window4.shape[1], v_window4.shape[2])
                     t_window = t_window.view(1, crops, t_window.shape[1], t_window.shape[2])
-                    snippet_scores, av, at, a_fused = get_predicts(v_window, t_window, model)
+
+                    # pdb.set_trace()
+
+                    # feature_list = [v_window, v_window2, v_window3, t_window]
+                    feature_list = [v_window, v_window4, t_window]
+
+
+                    snippet_scores, av, at, a_fused = get_predicts(feature_list, model)
                     # check_for_nan(snippet_scores, 'snippet_scores')
                     # snippet_scores = torch.squeeze(snippet_scores, 1)
 
