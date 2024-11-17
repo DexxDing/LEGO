@@ -2,5 +2,5 @@
 https://drive.google.com/file/d/1y8DPEqG_J5FsuVe91IN9Qstpf5KxNQOG/view?usp=sharing
 
 ### to run the code:
-`python main.py --dataset ped2 --feature-group both  --batch-size 16`
+`python main.py --dataset shanghai_v2 --feature-group both  --batch-size 32`
 
