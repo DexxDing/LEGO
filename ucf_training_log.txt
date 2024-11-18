@@ -1,0 +1,109 @@
+Setting up a new session...
+Without the incoming socket you cannot receive events from the server or register event handlers to your Visdom client.
+Epoch 1 Batch 1 Loss: 0.3958 
+Epoch 1 Batch 2 Loss: 21.8699 
+Epoch 1 Test AUC: 0.6298, Test AP: 0.0734
+Epoch 2 Batch 1 Loss: 0.0232 
+Epoch 2 Batch 2 Loss: 0.0591 
+Epoch 2 Test AUC: 0.6840, Test AP: 0.1001
+Epoch 3 Batch 1 Loss: 0.0975 
+Epoch 3 Batch 2 Loss: -0.0081 
+Epoch 3 Test AUC: 0.6932, Test AP: 0.1179
+Epoch 4 Batch 1 Loss: -0.2572 
+Epoch 4 Batch 2 Loss: -0.2781 
+Epoch 4 Test AUC: 0.6741, Test AP: 0.1235
+Epoch 5 Batch 1 Loss: 0.3581 
+Epoch 5 Batch 2 Loss: -0.3022 
+Epoch 5 Test AUC: 0.6393, Test AP: 0.1051
+Epoch 6 Batch 1 Loss: 0.1676 
+Epoch 6 Batch 2 Loss: -0.1632 
+Epoch 6 Test AUC: 0.6014, Test AP: 0.0825
+Epoch 7 Batch 1 Loss: 0.1653 
+Epoch 7 Batch 2 Loss: -0.1696 
+Epoch 7 Test AUC: 0.5846, Test AP: 0.0740
+Epoch 8 Batch 1 Loss: 0.0024 
+Epoch 8 Batch 2 Loss: 0.1109 
+Epoch 8 Test AUC: 0.5772, Test AP: 0.0711
+Epoch 9 Batch 1 Loss: -0.0608 
+Epoch 9 Batch 2 Loss: -0.0595 
+Epoch 9 Test AUC: 0.5770, Test AP: 0.0696
+Epoch 10 Batch 1 Loss: 0.3635 
+Epoch 10 Batch 2 Loss: -0.0493 
+Epoch 10 Test AUC: 0.5820, Test AP: 0.0714
+Epoch 11 Batch 1 Loss: -0.1510 
+Epoch 11 Batch 2 Loss: -0.0681 
+Epoch 11 Test AUC: 0.5916, Test AP: 0.0759
+Epoch 12 Batch 1 Loss: -0.0408 
+Epoch 12 Batch 2 Loss: -0.1042 
+Epoch 12 Test AUC: 0.5920, Test AP: 0.0788
+Epoch 13 Batch 1 Loss: 0.2846 
+Epoch 13 Batch 2 Loss: -0.2181 
+Epoch 13 Test AUC: 0.5971, Test AP: 0.0835
+Epoch 14 Batch 1 Loss: -0.0912 
+Epoch 14 Batch 2 Loss: -0.3322 
+Epoch 14 Test AUC: 0.6217, Test AP: 0.0925
+Epoch 15 Batch 1 Loss: -0.2202 
+Epoch 15 Batch 2 Loss: -0.5576 
+Epoch 15 Test AUC: 0.6469, Test AP: 0.1047
+Epoch 16 Batch 1 Loss: -0.3438 
+Epoch 16 Batch 2 Loss: -0.4210 
+Epoch 16 Test AUC: 0.6539, Test AP: 0.1050
+Epoch 17 Batch 1 Loss: -0.4872 
+Epoch 17 Batch 2 Loss: -0.5708 
+Epoch 17 Test AUC: 0.6806, Test AP: 0.1142
+Epoch 18 Batch 1 Loss: -0.4813 
+Epoch 18 Batch 2 Loss: -0.3746 
+Epoch 18 Test AUC: 0.7079, Test AP: 0.1246
+Epoch 19 Batch 1 Loss: 0.0064 
+Epoch 19 Batch 2 Loss: -0.9372 
+Epoch 19 Test AUC: 0.7269, Test AP: 0.1312
+Epoch 20 Batch 1 Loss: -0.1033 
+Epoch 20 Batch 2 Loss: -0.5175 
+Epoch 20 Test AUC: 0.7389, Test AP: 0.1353
+Epoch 21 Batch 1 Loss: -0.2589 
+Epoch 21 Batch 2 Loss: -0.6132 
+Epoch 21 Test AUC: 0.7648, Test AP: 0.1514
+Epoch 22 Batch 1 Loss: -0.5181 
+Epoch 22 Batch 2 Loss: -0.5704 
+Epoch 22 Test AUC: 0.7792, Test AP: 0.1616
+Epoch 23 Batch 1 Loss: 0.1691 
+Epoch 23 Batch 2 Loss: -0.5679 
+Epoch 23 Test AUC: 0.7872, Test AP: 0.1700
+Epoch 24 Batch 1 Loss: -0.6024 
+Epoch 24 Batch 2 Loss: -0.4860 
+Epoch 24 Test AUC: 0.8070, Test AP: 0.1899
+Epoch 25 Batch 1 Loss: -0.0742 
+Epoch 25 Batch 2 Loss: -0.5519 
+Epoch 25 Test AUC: 0.8260, Test AP: 0.2115
+Epoch 26 Batch 1 Loss: -0.4729 
+Epoch 26 Batch 2 Loss: -0.1975 
+Epoch 26 Test AUC: 0.8335, Test AP: 0.2225
+Epoch 27 Batch 1 Loss: -0.6291 
+Epoch 27 Batch 2 Loss: -0.4858 
+Epoch 27 Test AUC: 0.8371, Test AP: 0.2282
+Epoch 28 Batch 1 Loss: -0.4983 
+Epoch 28 Batch 2 Loss: -0.7552 
+Epoch 28 Test AUC: 0.8538, Test AP: 0.2535
+Epoch 29 Batch 1 Loss: -0.5311 
+Epoch 29 Batch 2 Loss: -0.3548 
+Epoch 29 Test AUC: 0.8576, Test AP: 0.2600
+Epoch 30 Batch 1 Loss: -0.6662 
+Epoch 30 Batch 2 Loss: -0.8523 
+Epoch 30 Test AUC: 0.8556, Test AP: 0.2596
+Epoch 31 Batch 1 Loss: -0.4296 
+Epoch 31 Batch 2 Loss: -0.6258 
+Epoch 31 Test AUC: 0.8546, Test AP: 0.2592
+Epoch 32 Batch 1 Loss: -0.7361 
+Epoch 32 Batch 2 Loss: -0.3889 
+Epoch 32 Test AUC: 0.8585, Test AP: 0.2655
+Epoch 33 Batch 1 Loss: -0.5027 
+Epoch 33 Batch 2 Loss: -0.5044 
+Epoch 33 Test AUC: 0.8623, Test AP: 0.2699
+Epoch 34 Batch 1 Loss: -0.4428 
+Epoch 34 Batch 2 Loss: -0.7038 
+Epoch 34 Test AUC: 0.8644, Test AP: 0.2749
+Epoch 35 Batch 1 Loss: -0.5754 
+Epoch 35 Batch 2 Loss: -0.7296 
+Epoch 35 Test AUC: 0.8646, Test AP: 0.2800
+Epoch 36 Batch 1 Loss: -0.6095 
+Epoch 36 Batch 2 Loss: -0.5955 

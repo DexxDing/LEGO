@@ -1,0 +1,5 @@
+topk setup: m=4, n=4, w_var=1., threshold=0.5, k=1
+Epoch 1 Batch 1 Loss: 6.9631 
+Epoch 1 Test AUC: 0.3798, Test AP: 0.2708
+Epoch 2 Batch 1 Loss: 5.3646 
+Epoch 2 Test AUC: 0.3716, Test AP: 0.2713

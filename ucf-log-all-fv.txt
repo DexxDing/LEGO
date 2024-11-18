@@ -1,0 +1,9 @@
+go setup: m=1, n=1, w_var=1, threshold=0.5, k=10, graph operator: matrix
+Epoch 1 Batch 1 Loss: 0.6961 
+Task fv Epoch 1 Test AUC: 0.6009, Test AP: 0.1120
+Epoch 2 Batch 1 Loss: 0.6949 
+Task fv Epoch 2 Test AUC: 0.7369, Test AP: 0.1485
+Epoch 3 Batch 1 Loss: 0.6819 
+Task fv Epoch 3 Test AUC: 0.7550, Test AP: 0.1560
+Epoch 4 Batch 1 Loss: 0.6765 
+Task fv Epoch 4 Test AUC: 0.7602, Test AP: 0.1601

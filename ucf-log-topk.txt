@@ -1,0 +1,2 @@
+topk setup: m=4, n=4, w_var=1., threshold=0.5, k=1
+Epoch 1 Batch 1 Loss: 2.0453 

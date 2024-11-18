@@ -1,0 +1,26 @@
+w_var setup: m=4, n=4, w_var=0, threshold=0.5, k=10
+Epoch 1 Batch 1 Loss: 0.6926 
+Epoch 1 Test AUC: 0.3924, Test AP: 0.2838
+Epoch 2 Batch 1 Loss: 0.6816 
+Epoch 2 Test AUC: 0.4164, Test AP: 0.3286
+Epoch 3 Batch 1 Loss: 0.6740 
+Epoch 3 Test AUC: 0.4515, Test AP: 0.3585
+Epoch 4 Batch 1 Loss: 0.6686 
+Epoch 4 Test AUC: 0.4847, Test AP: 0.4082
+Epoch 5 Batch 1 Loss: 0.6627 
+Epoch 5 Test AUC: 0.5159, Test AP: 0.4622
+Epoch 6 Batch 1 Loss: 0.6574 
+Epoch 6 Test AUC: 0.5531, Test AP: 0.5459
+Epoch 7 Batch 1 Loss: 0.6526 
+Epoch 7 Test AUC: 0.5828, Test AP: 0.6199
+Epoch 8 Batch 1 Loss: 0.6481 
+Epoch 8 Test AUC: 0.6000, Test AP: 0.6536
+Epoch 9 Batch 1 Loss: 0.6437 
+Epoch 9 Test AUC: 0.6085, Test AP: 0.6619
+Epoch 10 Batch 1 Loss: 0.6394 
+Epoch 10 Test AUC: 0.6198, Test AP: 0.6657
+Epoch 11 Batch 1 Loss: 0.6351 
+Epoch 11 Test AUC: 0.6333, Test AP: 0.6715
+Epoch 12 Batch 1 Loss: 0.6306 
+Epoch 12 Test AUC: 0.6449, Test AP: 0.6787
+Epoch 13 Batch 1 Loss: 0.6263 

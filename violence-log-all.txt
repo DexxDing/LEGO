@@ -1,0 +1,15 @@
+Epoch 1 Batch 1 Loss: 0.6954 
+Epoch 1 Batch 2 Loss: 0.6898 
+Epoch 1 Batch 3 Loss: 0.6848 
+Epoch 1 Batch 4 Loss: 0.6801 
+Epoch 1 Batch 5 Loss: 0.6745 
+Epoch 1 Batch 6 Loss: 0.6680 
+Epoch 1 Batch 7 Loss: 0.6634 
+Epoch 1 Batch 8 Loss: 0.6600 
+Epoch 1 Batch 9 Loss: 0.6569 
+Epoch 1 Batch 10 Loss: 0.6496 
+Epoch 1 Batch 11 Loss: 0.6457 
+Epoch 1 Batch 12 Loss: 0.6413 
+Epoch 1 Batch 13 Loss: 0.6407 
+Epoch 1 Batch 14 Loss: 0.6258 
+Epoch 1 Batch 15 Loss: 0.6315 

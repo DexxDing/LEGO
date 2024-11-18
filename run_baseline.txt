@@ -1,0 +1,65 @@
+@echo off
+echo Running model training scripts...
+
+python main.py --dataset ped2 --feature-group both --modal fv --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal fv --batch-size 32
+python main.py --dataset ave --feature-group both --modal fv --batch-size 8
+python main.py --dataset street --feature-group both --modal fv --batch-size 8
+python main.py --dataset combine --feature-group both --modal fv --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal ft --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal ft --batch-size 32
+python main.py --dataset ave --feature-group both --modal ft --batch-size 8
+python main.py --dataset street --feature-group both --modal ft --batch-size 8
+python main.py --dataset combine --feature-group both --modal ft --batch-size 8
+
+python main.py --dataset ped2 --feature-group both  --modal av --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both  --modal av --batch-size 32
+python main.py --dataset ave --feature-group both  --modal av --batch-size 8
+python main.py --dataset street --feature-group both  --modal av --batch-size 8
+python main.py --dataset combine --feature-group both  --modal av --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal at --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal at --batch-size 32
+python main.py --dataset ave --feature-group both --modal at --batch-size 8
+python main.py --dataset street --feature-group both --modal at --batch-size 8
+python main.py --dataset combine --feature-group both --modal at --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal fv+ft --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal fv+ft --batch-size 32
+python main.py --dataset ave --feature-group both --modal fv+ft --batch-size 8
+python main.py --dataset street --feature-group both --modal fv+ft --batch-size 8
+python main.py --dataset combine --feature-group both --modal fv+ft --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal fv*ft --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal fv*ft --batch-size 32
+python main.py --dataset ave --feature-group both --modal fv*ft --batch-size 8
+python main.py --dataset street --feature-group both --modal fv*ft --batch-size 8
+python main.py --dataset combine --feature-group both --modal fv*ft --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal fv(cat)ft --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal fv(cat)ft --batch-size 32
+python main.py --dataset ave --feature-group both --modal fv(cat)ft --batch-size 8
+python main.py --dataset street --feature-group both --modal fv(cat)ft --batch-size 8
+python main.py --dataset combine --feature-group both --modal fv(cat)ft --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal av+at --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal av+at --batch-size 32
+python main.py --dataset ave --feature-group both --modal av+at --batch-size 8
+python main.py --dataset street --feature-group both --modal av+at --batch-size 8
+python main.py --dataset combine --feature-group both --modal av+at --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal av*at --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal av*at --batch-size 32
+python main.py --dataset ave --feature-group both --modal av*at --batch-size 8
+python main.py --dataset street --feature-group both --modal av*at --batch-size 8
+python main.py --dataset combine --feature-group both --modal av*at --batch-size 8
+
+python main.py --dataset ped2 --feature-group both --modal av(cat)at --batch-size 8
+python main.py --dataset shanghai_v2 --feature-group both --modal av(cat)at --batch-size 32
+python main.py --dataset ave --feature-group both --modal av(cat)at --batch-size 8
+python main.py --dataset street --feature-group both --modal av(cat)at --batch-size 8
+python main.py --dataset combine --feature-group both --modal av(cat)at --batch-size 8
+
+echo All jobs have been executed.
+pause

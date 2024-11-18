@@ -1,0 +1,12 @@
+threshold setup: m=4, n=4, w_var=1., threshold=0, k=10
+Epoch 1 Batch 1 Loss: 3.1448 
+Epoch 1 Test AUC: 0.4212, Test AP: 0.2945
+Epoch 2 Batch 1 Loss: 1.0831 
+Epoch 2 Test AUC: 0.4477, Test AP: 0.3214
+Epoch 3 Batch 1 Loss: 0.7488 
+Epoch 3 Test AUC: 0.4534, Test AP: 0.3415
+Epoch 4 Batch 1 Loss: 0.7051 
+Epoch 4 Test AUC: 0.4532, Test AP: 0.3436
+Epoch 5 Batch 1 Loss: 0.6976 
+Epoch 5 Test AUC: 0.4513, Test AP: 0.3418
+Epoch 6 Batch 1 Loss: 0.7021 

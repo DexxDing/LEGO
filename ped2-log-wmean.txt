@@ -1,0 +1,7 @@
+w_mean setup: m=4, n=4, w_mean=0, threshold=0.5, k=10
+Epoch 1 Batch 1 Loss: 0.6926 
+Epoch 1 Test AUC: 0.3924, Test AP: 0.2838
+Epoch 2 Batch 1 Loss: 0.6816 
+Epoch 2 Test AUC: 0.4164, Test AP: 0.3286
+Epoch 3 Batch 1 Loss: 0.6740 
+Epoch 3 Test AUC: 0.4515, Test AP: 0.3585
